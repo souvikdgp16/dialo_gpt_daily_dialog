@@ -37,7 +37,7 @@ def _norm_text(text):
 
 
 def _get_inputs_from_text(text, tokenizer):
-    srcs, tgt = text.strip().split('\t')
+    srcs, tgt, emotion, dialog_act = text.strip().split('\t')
     weights = []
     inputs = []
     for src in srcs.split(' EOS '):
@@ -50,10 +50,10 @@ def _get_inputs_from_text(text, tokenizer):
         response_id = tokenizer.encode(tgt)
         weights.append(tgt_weight)
         inputs.append(response_id)
-    return weights, inputs
+    return weights, inputs, emotion, dialog_act
 
 
-def _make_features(id_, weights, inputs, tokenizer, max_len):
+def _make_features(id_, weights, inputs, tokenizer, max_len, emotion, dialog_act):
     end_of_text_id = tokenizer.encoder[END_OF_TEXT_TOKEN]
     features = []
     sents = []
@@ -63,7 +63,7 @@ def _make_features(id_, weights, inputs, tokenizer, max_len):
     for ids, w in zip(inputs, weights):
         if len(ids) > max_len:
             if len(sents) >= 2:
-                feat = _make_feature(id_ + i, sents, ws, end_of_text_id)
+                feat = _make_feature(id_ + i, sents, ws, end_of_text_id, emotion, dialog_act)
                 if feat is not None:
                     features.append(feat)
                     i += 1
@@ -72,7 +72,7 @@ def _make_features(id_, weights, inputs, tokenizer, max_len):
             ws = []
             continue
         elif len_ > max_len:
-            feat = _make_feature(id_ + i, sents, ws, end_of_text_id)
+            feat = _make_feature(id_ + i, sents, ws, end_of_text_id, emotion, dialog_act)
             if feat is not None:
                 features.append(feat)
                 i += 1
@@ -83,7 +83,7 @@ def _make_features(id_, weights, inputs, tokenizer, max_len):
         sents.append(ids)
         ws.append(w)
     if len(sents) >= 2:
-        feat = _make_feature(id_ + i, sents, ws, end_of_text_id)
+        feat = _make_feature(id_ + i, sents, ws, end_of_text_id, emotion, dialog_act)
         if feat is not None:
             features.append(feat)
 
@@ -138,7 +138,7 @@ def _make_feature(id_, sents, ws, eos):
         import pdb
         pdb.set_trace()
     feature = InputFeatures(id_, input_ids, position_ids, token_type_ids,
-                            lm_labels, weights)
+                            lm_labels, weights, emotion, dialog_act)
     return feature
 
 
@@ -172,7 +172,7 @@ def main(args):
                     chunk = chunk[args.chunk_size:]
                     n_chunk += 1
 
-                weights, inputs = _get_inputs_from_text(line, toker)
+                weights, inputs, emotion, dialog_act = _get_inputs_from_text(line, toker)
                 if args.reverse:
                     weights = list(reversed(weights))
                     inputs = list(reversed(inputs))
@@ -182,7 +182,7 @@ def main(args):
                 if len(weights) < 2:
                     continue
                 features = _make_features(n_example, weights, inputs,
-                                          toker, args.max_seq_len)
+                                          toker, args.max_seq_len, emotion, dialog_act)
                 for feature in features:
                     chunk.append(vars(feature))
                     n_example += 1
