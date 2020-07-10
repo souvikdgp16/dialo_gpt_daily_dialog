@@ -90,7 +90,7 @@ def _make_features(id_, weights, inputs, tokenizer, max_len, emotion, dialog_act
     return features
 
 
-def _make_feature(id_, sents, ws, eos):
+def _make_feature(id_, sents, ws, eos, emotion, dialog_act):
     if all(w == 0 for w in ws[1:]):
         return None
     input_ids = [i for s in sents for i in s+[eos]][:-1]
