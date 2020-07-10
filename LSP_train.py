@@ -278,7 +278,8 @@ while True:
         input_ids, position_ids, token_ids, label_ids, emotion_labels, da_labels, *_ = batch
         if args.no_token_id:
             token_ids = None
-        loss, ppl = model(input_ids, position_ids, token_ids, label_ids, emotion_labels, da_labels)
+        
+        loss, ppl = model(input_ids, position_ids, token_ids, label_ids, emotion_labels=emotion_labels, da_labels=da_labels)
 
         if n_gpu > 1:
             loss = loss.mean()
