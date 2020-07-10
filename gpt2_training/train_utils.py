@@ -80,7 +80,7 @@ class InputFeatures(object):
 
 class InputFeatures_train(object):
     def __init__(self, conv_id, input_ids, position_ids, token_type_ids,
-                 lm_labels, weights, input_len=None, emotion, dialog_act):
+                 lm_labels, weights, input_len=None, emotion=None, dialog_act=None):
         self.conv_id = conv_id
         self.input_ids = input_ids
         self.position_ids = position_ids
