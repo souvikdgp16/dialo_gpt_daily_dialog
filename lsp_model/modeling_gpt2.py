@@ -99,7 +99,7 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
             loss = torch.sum(loss1)/torch.sum(label_size)
 
             if emotion_labels is not None:
-                emotion_logits = self.out(self.dropout(hidden_states[-1]))
+                emotion_logits = self.emotion_head(self.dropout(hidden_states[-1]))
                 outputs = [emotion_logits]
                 loss_fct_emotion = torch.nn.CrossEntropyLoss()
                 loss_emotion = loss_fct_emotion(emotion_logits.view(-1, 6), emotion_labels.view(-1))
