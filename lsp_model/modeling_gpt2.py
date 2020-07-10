@@ -77,7 +77,7 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
         self.apply(self.init_weights)
         print(config)
         self.emotion_head = torch.nn.Linear(config.n_embd, 6)
-        self.dropout = torch.nn.Dropout(config.hidden_dropout_prob)
+        self.dropout = torch.nn.Dropout(0.7)
 
     def set_tied(self):
         """ Make sure we are sharing the embeddings
