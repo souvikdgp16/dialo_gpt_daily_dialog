@@ -138,6 +138,7 @@ class BucketingDataLoader(object):
             trunc_chunk = []
             lens = []
             for feat in chunk:
+                print(feat)
                 if feat['input_len'] > self.max_len:
                     continue
                 trunc_chunk.append(feat)
