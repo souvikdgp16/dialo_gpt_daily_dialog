@@ -289,7 +289,7 @@ while True:
             emotion_labels = None
 
         if args.emotion is False:
-            emotion_labels = None
+            da_labels = None
 
         loss, ppl = model(input_ids, position_ids, token_ids, label_ids, emotion_labels=emotion_labels, da_labels=da_labels)
 
