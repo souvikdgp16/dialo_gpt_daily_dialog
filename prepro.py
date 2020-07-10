@@ -138,7 +138,7 @@ def _make_feature(id_, sents, ws, eos, emotion, dialog_act):
         import pdb
         pdb.set_trace()
     feature = InputFeatures(id_, input_ids, position_ids, token_type_ids,
-                            lm_labels, weights, emotion, dialog_act)
+                            lm_labels, weights, emotion=int(emotion), dialog_act=int(dialog_act))
     return feature
 
 
