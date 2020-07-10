@@ -80,7 +80,7 @@ class InputFeatures(object):
 
 class InputFeatures_train(object):
     def __init__(self, conv_id, input_ids, position_ids, token_type_ids,
-                 lm_labels, weights, input_len=None):
+                 lm_labels, weights, input_len=None, emotion, dialog_act):
         self.conv_id = conv_id
         self.input_ids = input_ids
         self.position_ids = position_ids
@@ -91,6 +91,8 @@ class InputFeatures_train(object):
             self.input_len = len(input_ids)
         else:
             self.input_len = input_len
+        self.emotion = emotion
+        self.dialog_act = dialog_act
 
 
 class RedditExample(object):
