@@ -84,6 +84,11 @@ parser.add_argument('--pbar', type=boolean_string, default=True, help='turn on p
 # distributed
 parser.add_argument('--local_rank', type=int, default=-1,
                     help='for torch.distributed')
+
+parser.add_argument('--emotion', type=boolean_string, default=False)
+parser.add_argument('--da', type=boolean_string, default=False)
+parser.add_argument('--model_name_save', type=str, default="model_dd.bin")
+
 parser.add_argument('--config', help='JSON config file')
 
 
@@ -270,6 +275,7 @@ while True:
     model.train()
     (tr_loss, tr_ppl, mean_ppl, nb_tr_examples, nb_tr_steps) = 0.0, 0.0, 0.0, 0, 0
     n_token_real, n_token_total = 0, 0
+    min_eval_ppl = 0
     train_start_time_epoch = time.time()
     for batch in train_dataloader:
         # activate new training mode
@@ -278,7 +284,13 @@ while True:
         input_ids, position_ids, token_ids, label_ids, emotion_labels, da_labels, *_ = batch
         if args.no_token_id:
             token_ids = None
-        
+
+        if args.emotion is False:
+            emotion_labels = None
+
+        if args.emotion is False:
+            emotion_labels = None
+
         loss, ppl = model(input_ids, position_ids, token_ids, label_ids, emotion_labels=emotion_labels, da_labels=da_labels)
 
         if n_gpu > 1:
@@ -368,6 +380,8 @@ while True:
                         file=eval_logger)
                     logger.info('current learning rate: '
                                 + str(optimizer.param_groups[0]['lr']))
+                    logger.info('saving model')
+                    torch.save(model.state_dict(), f'./{args.model_name_save}')
                     model.train()
             if global_step >= args.num_optim_steps:
                 break

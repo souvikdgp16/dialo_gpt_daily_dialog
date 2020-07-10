@@ -76,8 +76,9 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
         self.lm_head = GPT2LMHead(self.transformer.wte.weight, config)
         self.apply(self.init_weights)
         print(config)
-        self.emotion_head = torch.nn.Linear(config.n_embd, 6)
-        self.dropout = torch.nn.Dropout(0.7)
+        self.emotion_head = torch.nn.Linear(config.n_embd, 7, bias=False)
+        self.da_head = torch.nn.Linear(config.n_embd, 4, bias=False)
+        self.dropout = torch.nn.Dropout(0.2)
 
     def set_tied(self):
         """ Make sure we are sharing the embeddings
@@ -98,13 +99,31 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
             label_size = torch.sum(lm_labels != -1, dim=1).type(loss1.type())
             loss = torch.sum(loss1)/torch.sum(label_size)
 
+            if emotion_labels is not None and da_labels is not None:
+                loss = 0.8 * loss
+            elif emotion_labels is not None or da_labels is not None:
+                loss = 0.9 * loss
+
             if emotion_labels is not None:
-                emotion_logits = self.emotion_head(self.dropout(hidden_states[-1]))
-                outputs = [emotion_logits]
+                emotion_logits = self.emotion_head(hidden_states[:, -1, :])
+                #print(hidden_states.shape, emotion_logits.shape)
+                
                 loss_fct_emotion = torch.nn.CrossEntropyLoss()
-                loss_emotion = loss_fct_emotion(emotion_logits.view(-1, 6), emotion_labels.view(-1))
+                loss_emotion = loss_fct_emotion(emotion_logits.view(-1, 7), emotion_labels.view(-1))
+                #loss_emotion = loss_fct_emotion(emotion_logits.view(-1, 7), emotion_labels.view(-1))
 
                 loss += 0.1*loss_emotion
+
+            if da_labels is not None:
+                da_logits = self.emotion_head(hidden_states[:, -1, :])
+                #print(hidden_states.shape, emotion_logits.shape)
+                
+                loss_fct_da = torch.nn.CrossEntropyLoss()
+                loss_da = loss_fct_da(da_logits.view(-1, 4), da_labels.view(-1))
+                #loss_emotion = loss_fct_emotion(emotion_logits.view(-1, 7), emotion_labels.view(-1))
+
+                loss += 0.1*loss_da
+
 
 
             ppl = torch.exp(torch.mean(torch.sum(loss1, dim=1).float()
