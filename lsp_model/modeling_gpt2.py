@@ -75,13 +75,15 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
         self.transformer = GPT2ModelFP16(config)
         self.lm_head = GPT2LMHead(self.transformer.wte.weight, config)
         self.apply(self.init_weights)
+        self.emotion_head = torch.nn.Linear(config.hidden_size*2, 6)
+        self.dropout = torch.nn.Dropout(config.hidden_dropout_prob)
 
     def set_tied(self):
         """ Make sure we are sharing the embeddings
         """
         self.lm_head.set_embeddings_weights(self.transformer.wte.weight)
 
-    def forward(self, input_ids, position_ids=None, token_type_ids=None, lm_labels=None, past=None):
+    def forward(self, input_ids, position_ids=None, token_type_ids=None, lm_labels=None, past=None, emotion_labels=None, da_labels=None):
         hidden_states, presents = self.transformer(input_ids, position_ids, token_type_ids, past)
         # import pdb; pdb.set_trace()
         lm_logits = self.lm_head(hidden_states)
@@ -94,6 +96,16 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
             loss1 = loss1.view(lm_labels.size(0), lm_labels.size(1))
             label_size = torch.sum(lm_labels != -1, dim=1).type(loss1.type())
             loss = torch.sum(loss1)/torch.sum(label_size)
+
+            if emotion_labels is not None:
+                emotion_logits = self.out(self.dropout(hidden_states[-1]))
+                outputs = [emotion_logits]
+                loss_fct_emotion = torch.nn.CrossEntropyLoss()
+                loss_emotion = loss_fct_emotion(emotion_logits.view(-1, 6), emotion_labels.view(-1))
+
+                loss += 0.1*loss_emotion
+
+
             ppl = torch.exp(torch.mean(torch.sum(loss1, dim=1).float()
                                        / label_size.float()))
             # ppl = torch.mean(torch.exp(torch.sum(loss1, dim=1)/label_size))

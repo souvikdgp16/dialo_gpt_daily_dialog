@@ -104,7 +104,14 @@ class GPT2FeatureDataset(Dataset):
         labels = pad_sequence([torch.tensor(f.lm_labels, dtype=torch.long)
                                for f in features],
                               batch_first=True, padding_value=-1)
-        return (input_ids, position_ids, token_type_ids, labels)
+
+        emotion_labels = torch.tensor([torch.tensor(f.emotion, dtype=torch.long)
+                               for f in features])
+
+        da_labels = torch.tensor([torch.tensor(f.dialog_act, dtype=torch.long)
+                               for f in features])
+
+        return (input_ids, position_ids, token_type_ids, labels, emotion_labels, da_labels)
 
 
 class BucketingDataLoader(object):
