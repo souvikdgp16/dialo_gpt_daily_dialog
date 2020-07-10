@@ -76,7 +76,7 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
         self.lm_head = GPT2LMHead(self.transformer.wte.weight, config)
         self.apply(self.init_weights)
         print(config)
-        self.emotion_head = torch.nn.Linear(config.hidden_size*2, 6)
+        self.emotion_head = torch.nn.Linear(config.n_embd, 6)
         self.dropout = torch.nn.Dropout(config.hidden_dropout_prob)
 
     def set_tied(self):
