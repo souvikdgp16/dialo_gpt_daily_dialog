@@ -275,7 +275,7 @@ while True:
     model.train()
     (tr_loss, tr_ppl, mean_ppl, nb_tr_examples, nb_tr_steps) = 0.0, 0.0, 0.0, 0, 0
     n_token_real, n_token_total = 0, 0
-    min_eval_ppl = 0
+    min_eval_ppl = 1000000
     train_start_time_epoch = time.time()
     for batch in train_dataloader:
         # activate new training mode
@@ -380,8 +380,10 @@ while True:
                         file=eval_logger)
                     logger.info('current learning rate: '
                                 + str(optimizer.param_groups[0]['lr']))
-                    logger.info('saving model')
-                    torch.save(model.state_dict(), f'./{args.model_name_save}')
+                    if eval_ppl < min_eval_ppl:
+                        min_eval_ppl = eval_ppl
+                        logger.info('saving model')
+                        torch.save(model.state_dict(), f'./{args.model_name_save}')
                     model.train()
             if global_step >= args.num_optim_steps:
                 break
