@@ -185,9 +185,12 @@ else:
         args.train_input_file, args.train_batch_size,
         args.max_seq_length)
 
-eval_dataloader_loss = DynamicBatchingLoader(
-    args.eval_input_file, enc, args.normalize_data,
-    args.eval_batch_size, args.max_seq_length)
+# eval_dataloader_loss = DynamicBatchingLoader(
+#     args.eval_input_file, enc, args.normalize_data,
+#     args.eval_batch_size, args.max_seq_length)
+
+eval_dataloader_loss = BucketingDataLoader(args.eval_input_file, 
+        args.eval_batch_size, args.max_seq_length)
 
 eval_dataloader_gen = get_eval_list_same_length(
     args.eval_input_file, enc, args.eval_batch_size, True)
