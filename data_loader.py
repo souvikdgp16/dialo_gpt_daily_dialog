@@ -247,7 +247,7 @@ class DynamicBatchingLoader(object):
                     while True:
                         line = next(corpus).encode('utf-8').decode('utf-8')
                         contents = line.split('\t')
-                        src, tgt_all = contents[0], contents[1:]
+                        src, tgt_all, emotion, dialog_act = contents[0], contents[1], contents[2], contents[3]
                         for tgt in tgt_all:
                             if self.norm:
                                 src_line = ' '.join(src.strip().split())
