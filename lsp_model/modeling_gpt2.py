@@ -89,6 +89,7 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
         hidden_states, presents = self.transformer(input_ids, position_ids, token_type_ids, past)
         # import pdb; pdb.set_trace()
         lm_logits = self.lm_head(hidden_states)
+        emotion_logits = da_logits = None
         if lm_labels is not None:
             # loss_fct = CrossEntropyLoss(ignore_index=-1)
             # loss = loss_fct(lm_logits.view(-1, lm_logits.size(-1)), lm_labels.view(-1))
@@ -126,10 +127,11 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
 
 
 
+
             ppl = torch.exp(torch.mean(torch.sum(loss1, dim=1).float()
                                        / label_size.float()))
             # ppl = torch.mean(torch.exp(torch.sum(loss1, dim=1)/label_size))
-            return loss, ppl
+            return loss, ppl, lm_logits, emotion_logits, da_logits
         return lm_logits, presents
     
     def forward_pointwise(self, input_ids, position_ids=None, token_type_ids=None, lm_labels=None, past=None):

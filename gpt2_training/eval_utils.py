@@ -57,18 +57,38 @@ def eval_model_loss(model, tokenizer, eval_dataloader, epoch_id, args):
     tot_loss = []
     tot_ppl = []
     tot_sample = []
+    generated =[]
+    reference =[]
+
     with torch.no_grad():
         for step, batch in enumerate(eval_dataloader):
             batch = tuple(t.to(args.device) for t in batch)
             # input_ids, position_ids, token_ids, label_ids, src_len, _ = batch
             input_ids, position_ids, token_ids, label_ids, emotion_labels, da_labels, *_ = batch
-            
+
             if args.no_token_id:
                 token_ids = None
             n_sample = input_ids.shape[0]
-            loss, ppl = model(input_ids, position_ids, token_ids, label_ids)
+            loss, ppl, lm_logits, emotion_logits, da_logits = model(input_ids, position_ids, token_ids, label_ids)
             tot_loss.append(loss.mean().item() * n_sample)
             tot_ppl.append(ppl.mean().item() * n_sample)
             tot_sample.append(n_sample)
+
+            for input_id in input_ids:
+                reference.append(tokenizer.decode(input_id).split(' '))
+
+            _, predicted_ids = torch.max(emotion_logits, dim=2)
+
+            for predicted_id in predicted_ids:
+                generated.append(tokenizer.decode(predicted_id).split(' '))
+
+    BLEUscore = cal_BLEU_4(generated, reference)
+
     print(f"\n Epoch {epoch_id}: Val loss {np.sum(tot_loss) / np.sum(tot_sample)} Val ppl {np.sum(tot_ppl) / np.sum(tot_sample)} ")
+    print(f"\n BLEU 1 {BLEUscore[0]}")
+    print(f"\n BLEU 2 {BLEUscore[1]}")
+    print(f"\n BLEU 3 {BLEUscore[2]}")
+    print(f"\n BLEU 4 {BLEUscore[3]}")
+
+
     return np.sum(tot_loss) / np.sum(tot_sample), np.sum(tot_ppl) / np.sum(tot_sample)
