@@ -113,7 +113,7 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
                 loss_emotion = loss_fct_emotion(emotion_logits.view(-1, 7), emotion_labels.view(-1))
                 #loss_emotion = loss_fct_emotion(emotion_logits.view(-1, 7), emotion_labels.view(-1))
 
-                #loss += 0.1*loss_emotion
+                loss += 0.1*loss_emotion
 
             if da_labels is not None:
                 da_logits = self.da_head(hidden_states[:, -1, :])
@@ -123,7 +123,7 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
                 loss_da = loss_fct_da(da_logits.view(-1, 4), da_labels.view(-1))
                 #loss_emotion = loss_fct_emotion(emotion_logits.view(-1, 7), emotion_labels.view(-1))
 
-                #loss += 0.1*loss_da
+                loss += 0.1*loss_da
 
 
 

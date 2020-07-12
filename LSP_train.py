@@ -301,6 +301,7 @@ while True:
             loss = loss.mean()
             ppl = ppl.mean()
         loss = loss / (args.train_batch_size / input_ids.shape[0])
+        print(loss)
         if args.fp16:
             optimizer.backward(loss)
         else:
