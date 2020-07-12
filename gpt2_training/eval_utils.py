@@ -15,10 +15,10 @@ EOS_ID = 50256
 
 def nltk_BLEU_4(generated, reference):
     BLEUscore = [0.0, 0.0, 0.0, 0.0]
-    BLEUscore[0] = corpus_bleu(references, generated, weights=(1,0,0,0))*100
-    BLEUscore[1] = corpus_bleu(references, generated, weights=(0,1,0,0))*100
-    BLEUscore[2] = corpus_bleu(references, generated, weights=(0,0,1,0))*100
-    BLEUscore[3] = corpus_bleu(references, generated, weights=(0,0,0,1))*100
+    BLEUscore[0] = corpus_bleu(reference, generated, weights=(1,0,0,0))*100
+    BLEUscore[1] = corpus_bleu(reference, generated, weights=(0,1,0,0))*100
+    BLEUscore[2] = corpus_bleu(reference, generated, weights=(0,0,1,0))*100
+    BLEUscore[3] = corpus_bleu(reference, generated, weights=(0,0,0,1))*100
 
     return BLEUscore
 
