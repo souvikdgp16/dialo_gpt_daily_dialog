@@ -100,10 +100,10 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
             label_size = torch.sum(lm_labels != -1, dim=1).type(loss1.type())
             loss = torch.sum(loss1)/torch.sum(label_size)
 
-            if emotion_labels is not None and da_labels is not None:
-                loss = 0.8 * loss
-            elif emotion_labels is not None or da_labels is not None:
-                loss = 0.9 * loss
+            # if emotion_labels is not None and da_labels is not None:
+            #     loss = 0.8 * loss
+            # elif emotion_labels is not None or da_labels is not None:
+            #     loss = 0.9 * loss
 
             if emotion_labels is not None:
                 emotion_logits = self.emotion_head(hidden_states[:, -1, :])
