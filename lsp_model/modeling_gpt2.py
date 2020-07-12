@@ -116,7 +116,7 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
                 loss += 0.1*loss_emotion
 
             if da_labels is not None:
-                da_logits = self.emotion_head(hidden_states[:, -1, :])
+                da_logits = self.da_head(hidden_states[:, -1, :])
                 #print(hidden_states.shape, emotion_logits.shape)
                 
                 loss_fct_da = torch.nn.CrossEntropyLoss()
