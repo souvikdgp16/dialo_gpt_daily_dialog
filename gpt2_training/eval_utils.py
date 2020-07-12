@@ -7,10 +7,20 @@ import numpy as np
 
 from pycocoevalcap.bleu.bleu import Bleu
 from collections import defaultdict
+from nltk.translate.bleu_score import corpus_bleu
 
 logger = logging.getLogger(__name__)
 
 EOS_ID = 50256
+
+def nltk_BLEU_4(generated, reference):
+    BLEUscore = [0.0, 0.0, 0.0, 0.0]
+    BLEUscore[0] = corpus_bleu(references, candidates, weights=(1,0,0,0))*100
+    BLEUscore[1] = corpus_bleu(references, candidates, weights=(0,1,0,0))*100
+    BLEUscore[2] = corpus_bleu(references, candidates, weights=(0,0,1,0))*100
+    BLEUscore[3] = corpus_bleu(references, candidates, weights=(0,0,0,1))*100
+
+    return BLEUscore
 
 
 def cal_BLEU_4(generated, reference, is_corpus=False):
@@ -75,14 +85,14 @@ def eval_model_loss(model, tokenizer, eval_dataloader, epoch_id, args):
             tot_sample.append(n_sample)
 
             for input_id in input_ids:
-                reference.append(tokenizer.decode(input_id).split(' '))
+                reference.append([tokenizer.decode(input_id).split(' ')])
 
             _, predicted_ids = torch.max(lm_logits, dim=2)
 
             for predicted_id in predicted_ids:
                 generated.append(tokenizer.decode(predicted_id).split(' '))
 
-    BLEUscore = cal_BLEU_4(generated, reference)
+    BLEUscore = nltk_BLEU_4(generated, reference)
 
     print(f"\n Epoch {epoch_id}: Val loss {np.sum(tot_loss) / np.sum(tot_sample)} Val ppl {np.sum(tot_ppl) / np.sum(tot_sample)} ")
     print(f"\n BLEU 1 {BLEUscore[0]}")
