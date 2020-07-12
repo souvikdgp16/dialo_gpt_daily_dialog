@@ -109,7 +109,7 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
                 emotion_logits = self.emotion_head(hidden_states[:, -1, :])
                 #print(hidden_states.shape, emotion_logits.shape)
                 
-                loss_fct_emotion = torch.nn.CrossEntropyLoss()
+                loss_fct_emotion = torch.nn.CrossEntropyLoss(ignore_index=-1, reduction='none')
                 loss_emotion = loss_fct_emotion(emotion_logits.view(-1, 7), emotion_labels.view(-1))
                 #loss_emotion = loss_fct_emotion(emotion_logits.view(-1, 7), emotion_labels.view(-1))
 
@@ -119,7 +119,7 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
                 da_logits = self.da_head(hidden_states[:, -1, :])
                 #print(hidden_states.shape, emotion_logits.shape)
                 
-                loss_fct_da = torch.nn.CrossEntropyLoss()
+                loss_fct_da = torch.nn.CrossEntropyLoss(ignore_index=-1, reduction='none')
                 loss_da = loss_fct_da(da_logits.view(-1, 4), da_labels.view(-1))
                 #loss_emotion = loss_fct_emotion(emotion_logits.view(-1, 7), emotion_labels.view(-1))
 
