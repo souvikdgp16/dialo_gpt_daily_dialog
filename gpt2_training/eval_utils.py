@@ -77,7 +77,7 @@ def eval_model_loss(model, tokenizer, eval_dataloader, epoch_id, args):
             for input_id in input_ids:
                 reference.append(tokenizer.decode(input_id).split(' '))
 
-            _, predicted_ids = torch.max(emotion_logits, dim=2)
+            _, predicted_ids = torch.max(lm_logits, dim=2)
 
             for predicted_id in predicted_ids:
                 generated.append(tokenizer.decode(predicted_id).split(' '))

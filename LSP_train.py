@@ -20,9 +20,10 @@ import numpy as np
 from os.path import join
 from torch.distributed import get_rank, get_world_size
 
-from lsp_model import GPT2LMHeadModel, GPT2Tokenizer, GPT2Config, Adam
+from lsp_model import GPT2LMHeadModel, GPT2Config, Adam
 from gpt2_training.train_utils import load_model, boolean_string, set_lr, get_eval_list_same_length
 from gpt2_training.eval_utils import eval_model_loss
+from transformers import GPT2Tokenizer
 
 from data_loader import BucketingDataLoader, DynamicBatchingLoader, DistributedBucketingDataLoader
 
