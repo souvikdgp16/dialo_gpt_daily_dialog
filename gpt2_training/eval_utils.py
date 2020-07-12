@@ -85,6 +85,7 @@ def eval_model_loss(model, tokenizer, eval_dataloader, epoch_id, args):
             tot_sample.append(n_sample)
 
             for label_id in label_ids:
+                label_id = label_id[label_id!=-1]
                 reference.append([tokenizer.decode(label_id).split(' ')])
 
             _, predicted_ids = torch.max(lm_logits, dim=2)
