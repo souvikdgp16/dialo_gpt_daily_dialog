@@ -55,7 +55,7 @@ parser.add_argument("--continue_from", type=int, default=0)
 # parser.add_argument("--gradient_accumulation_steps", type=int, default=2,
 #                     help="to increase effective batch size "
 #                          "and reduce synchronization")
-# parser.add_argument("--eval_batch_size", type=int, default=4)
+parser.add_argument("--eval_batch_size", type=int, default=4)
 # parser.add_argument("--learning_rate", type=float, default=1e-5)
 # parser.add_argument("--num_optim_steps", type=int, default=1000000,
 #                     help="new API specifies num update steps")
