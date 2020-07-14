@@ -76,8 +76,8 @@ parser.add_argument("--log_dir", type=str)
 parser.add_argument('--pbar', type=boolean_string, default=True, help='turn on progress bar')
 
 # distributed
-# parser.add_argument('--local_rank', type=int, default=-1,
-#                     help='for torch.distributed')
+parser.add_argument('--local_rank', type=int, default=-1,
+                    help='for torch.distributed')
 
 parser.add_argument('--emotion', type=boolean_string, default=False)
 parser.add_argument('--da', type=boolean_string, default=False)
