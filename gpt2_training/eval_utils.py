@@ -147,10 +147,10 @@ def get_model_metrics(model, tokenizer, eval_dataloader, args):
             _, da_ids = torch.max(da_logits, dim=1)
 
             emotion_labels_op.extend(emotion_labels)
-            emotion_labels_pred.extend(emo_ids)
+            emotion_labels_pred.extend(emo_ids.tolist())
 
             da_labels_op.extend(da_labels)
-            da_labels_pred.extend(da_ids)
+            da_labels_pred.extend(da_ids.tolist())
 
 
 
@@ -162,16 +162,16 @@ def get_model_metrics(model, tokenizer, eval_dataloader, args):
     print(f"\n BLEU 3 {BLEUscore[2]}")
     print(f"\n BLEU 4 {BLEUscore[3]}")
 
-    print(f"\n F1 EMO {f1_score(emotion_labels_op, emotion_labels_pred, average='micro')}")
-    print(f"\n precision_score EMO {precision_score(emotion_labels_op, emotion_labels_pred, average='micro')}")
-    print(f"\n recall_score EMO {recall_score(emotion_labels_op, emotion_labels_pred, average='micro')}")
+    print(f"\n F1 EMO {f1_score(emotion_labels_op, emotion_labels_pred, average='macro')}")
+    print(f"\n precision_score EMO {precision_score(emotion_labels_op, emotion_labels_pred, average='macro')}")
+    print(f"\n recall_score EMO {recall_score(emotion_labels_op, emotion_labels_pred, average='macro')}")
     print(f"\n accuracy_score EMO {accuracy_score(emotion_labels_op, emotion_labels_pred)}")
     print(f"\n confusion_matrix EMO {confusion_matrix(emotion_labels_op, emotion_labels_pred)}")
 
 
-    print(f"\n F1 DA {f1_score(da_labels_op, da_labels_pred, average='micro')}")
-    print(f"\n precision_score DA {precision_score(da_labels_op, da_labels_pred, average='micro')}")
-    print(f"\n recall_score DA {recall_score(da_labels_op, da_labels_pred, average='micro')}")
+    print(f"\n F1 DA {f1_score(da_labels_op, da_labels_pred, average='macro')}")
+    print(f"\n precision_score DA {precision_score(da_labels_op, da_labels_pred, average='macro')}")
+    print(f"\n recall_score DA {recall_score(da_labels_op, da_labels_pred, average='macro')}")
     print(f"\n accuracy_score DA {accuracy_score(da_labels_op, da_labels_pred)}")
     print(f"\n confusion_matrix DA {confusion_matrix(da_labels_op, da_labels_pred)}")
 
