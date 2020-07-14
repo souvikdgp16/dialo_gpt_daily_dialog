@@ -8,6 +8,7 @@ import numpy as np
 from pycocoevalcap.bleu.bleu import Bleu
 from collections import defaultdict
 from nltk.translate.bleu_score import corpus_bleu
+from sklearn.metrics import accuracy_score,f1_score,precision_score,recall_score,confusion_matrix
 
 logger = logging.getLogger(__name__)
 
@@ -103,3 +104,75 @@ def eval_model_loss(model, tokenizer, eval_dataloader, epoch_id, args):
 
 
     return np.sum(tot_loss) / np.sum(tot_sample), np.sum(tot_ppl) / np.sum(tot_sample)
+
+
+
+def get_model_metrics(model, tokenizer, eval_dataloader, args):
+    # use the same signature with eval_model_generation
+    logger.info('compute eval model loss, using eval mode, '
+                'please change it back to train after calling this function')
+    model.eval()
+    tot_loss = []
+    tot_ppl = []
+    tot_sample = []
+    generated =[]
+    reference =[]
+    emotion_labels_op, emotion_labels_pred =[] , []
+    da_labels_op, da_labels_pred =[] , []
+
+    with torch.no_grad():
+        for step, batch in enumerate(eval_dataloader):
+            batch = tuple(t.to(args.device) for t in batch)
+            # input_ids, position_ids, token_ids, label_ids, src_len, _ = batch
+            input_ids, position_ids, token_ids, label_ids, emotion_labels, da_labels, *_ = batch
+
+            if args.no_token_id:
+                token_ids = None
+            n_sample = input_ids.shape[0]
+            loss, ppl, lm_logits, emotion_logits, da_logits = model(input_ids, position_ids, token_ids, label_ids)
+            tot_loss.append(loss.mean().item() * n_sample)
+            tot_ppl.append(ppl.mean().item() * n_sample)
+            tot_sample.append(n_sample)
+
+            for input_id in input_ids:
+                reference.append([tokenizer.decode(input_id).split(' ')])
+
+            _, predicted_ids = torch.max(lm_logits, dim=2)
+
+            for predicted_id in predicted_ids:
+                generated.append(tokenizer.decode(predicted_id).split(' '))
+
+            _, emo_ids = torch.max(emotion_labels, dim=1)
+            _, da_ids = torch.max(da_labels, dim=1)
+
+            emotion_labels_op.extend(emotion_labels)
+            emotion_labels_pred.extend(emo_ids)
+
+            da_labels_op.extend(da_labels)
+            da_labels_pred.extend(da_ids)
+
+
+
+    BLEUscore = nltk_BLEU_4(generated, reference)
+
+    #print(f"\n Epoch {epoch_id}: Val loss {np.sum(tot_loss) / np.sum(tot_sample)} Val ppl {np.sum(tot_ppl) / np.sum(tot_sample)} ")
+    print(f"\n BLEU 1 {BLEUscore[0]}")
+    print(f"\n BLEU 2 {BLEUscore[1]}")
+    print(f"\n BLEU 3 {BLEUscore[2]}")
+    print(f"\n BLEU 4 {BLEUscore[3]}")
+
+    print(f"\n F1 EMO {f1_score(emotion_labels_op, emotion_labels_pred, average='micro')}")
+    print(f"\n precision_score EMO {precision_score(emotion_labels_op, emotion_labels_pred, average='micro')}")
+    print(f"\n recall_score EMO {recall_score(emotion_labels_op, emotion_labels_pred, average='micro')}")
+    print(f"\n accuracy_score EMO {accuracy_score(emotion_labels_op, emotion_labels_pred)}")
+    print(f"\n confusion_matrix EMO {confusion_matrix(emotion_labels_op, emotion_labels_pred)}")
+
+
+    print(f"\n F1 DA {f1_score(da_labels_op, da_labels_pred, average='micro')}")
+    print(f"\n precision_score DA {precision_score(da_labels_op, da_labels_pred, average='micro')}")
+    print(f"\n recall_score DA {recall_score(da_labels_op, da_labels_pred, average='micro')}")
+    print(f"\n accuracy_score DA {accuracy_score(da_labels_op, da_labels_pred)}")
+    print(f"\n confusion_matrix DA {confusion_matrix(da_labels_op, da_labels_pred)}")
+
+
+    return np.sum(tot_loss) / np.sum(tot_sample), np.sum(tot_ppl) / np.sum(tot_sample)  
