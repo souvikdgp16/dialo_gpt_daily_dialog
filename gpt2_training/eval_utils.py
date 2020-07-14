@@ -129,7 +129,8 @@ def get_model_metrics(model, tokenizer, eval_dataloader, args):
             if args.no_token_id:
                 token_ids = None
             n_sample = input_ids.shape[0]
-            loss, ppl, lm_logits, emotion_logits, da_logits = model(input_ids, position_ids, token_ids, label_ids, emotion_labels, da_labels)
+            loss, ppl, lm_logits, emotion_logits, da_logits = model(input_ids, position_ids, token_ids, label_ids, \
+                emotion_labels=emotion_labels, da_labels=da_labels)
             tot_loss.append(loss.mean().item() * n_sample)
             tot_ppl.append(ppl.mean().item() * n_sample)
             tot_sample.append(n_sample)
