@@ -146,10 +146,10 @@ def get_model_metrics(model, tokenizer, eval_dataloader, args):
             _, emo_ids = torch.max(emotion_logits, dim=1)
             _, da_ids = torch.max(da_logits, dim=1)
 
-            emotion_labels_op.extend(emotion_labels)
+            emotion_labels_op.extend(emotion_labels.tolist())
             emotion_labels_pred.extend(emo_ids.tolist())
 
-            da_labels_op.extend(da_labels)
+            da_labels_op.extend(da_labels.tolist())
             da_labels_pred.extend(da_ids.tolist())
 
 
