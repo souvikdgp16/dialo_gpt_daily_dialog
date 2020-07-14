@@ -178,6 +178,6 @@ eval_dataloader_loss = BucketingDataLoader(args.eval_input_file,
 model = load_model(GPT2LMHeadModel(config), args.init_checkpoint,
                    args, verbose=True)
 
-eval_loss, eval_ppl = eval_model_loss(
+eval_loss, eval_ppl = get_model_metrics(
                         model, enc, eval_dataloader_loss, args)
 
