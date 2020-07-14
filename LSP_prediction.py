@@ -151,15 +151,15 @@ enc = GPT2Tokenizer.from_pretrained(args.model_name_or_path)
 config = GPT2Config.from_json_file(
     join(args.model_name_or_path, 'config.json'))
 
-if args.local_rank == -1:
-    train_dataloader = BucketingDataLoader(args.train_input_file,
-                                           args.train_batch_size,
-                                           args.max_seq_length)
-else:
-    train_dataloader = DistributedBucketingDataLoader(
-        get_rank(), get_world_size(),
-        args.train_input_file, args.train_batch_size,
-        args.max_seq_length)
+# if args.local_rank == -1:
+#     train_dataloader = BucketingDataLoader(args.train_input_file,
+#                                            args.train_batch_size,
+#                                            args.max_seq_length)
+# else:
+#     train_dataloader = DistributedBucketingDataLoader(
+#         get_rank(), get_world_size(),
+#         args.train_input_file, args.train_batch_size,
+#         args.max_seq_length)
 
 # eval_dataloader_loss = DynamicBatchingLoader(
 #     args.eval_input_file, enc, args.normalize_data,
