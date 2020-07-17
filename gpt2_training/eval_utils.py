@@ -165,7 +165,7 @@ def get_model_metrics(model, tokenizer, eval_dataloader, args):
     gen, ref = [], []
     for g in zip(generated, reference):
         gen.append(' '.join(g[0]))
-        ref.append(' '.join(g[1]))
+        ref.append(' '.join(g[1][0]))
 
 
     P, R, F1 = score(gen, ref, lang='en', verbose=True)
