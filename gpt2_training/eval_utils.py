@@ -152,9 +152,14 @@ def get_model_metrics(model, tokenizer, eval_dataloader, args):
             da_labels_op.extend(da_labels.tolist())
             da_labels_pred.extend(da_ids.tolist())
 
+            
+
 
 
     BLEUscore = nltk_BLEU_4(generated, reference)
+
+    P, R, F1 = score(generated, reference, lang='en', verbose=True)
+    print("BERTscore = ",F1.mean())
 
     #print(f"\n Epoch {epoch_id}: Val loss {np.sum(tot_loss) / np.sum(tot_sample)} Val ppl {np.sum(tot_ppl) / np.sum(tot_sample)} ")
     print(f"\n BLEU 1 {BLEUscore[0]}")
