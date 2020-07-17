@@ -165,9 +165,10 @@ def get_model_metrics(model, tokenizer, eval_dataloader, args):
     gen, ref = [], []
     for g in zip(generated, reference):
         gen.append(' '.join(g[0]))
+        ref.append(' '.join(g[1]))
 
 
-    P, R, F1 = score(generated, reference, lang='en', verbose=True)
+    P, R, F1 = score(gen, ref, lang='en', verbose=True)
     print("BERTscore = ",F1.mean())
 
     #print(f"\n Epoch {epoch_id}: Val loss {np.sum(tot_loss) / np.sum(tot_sample)} Val ppl {np.sum(tot_ppl) / np.sum(tot_sample)} ")
