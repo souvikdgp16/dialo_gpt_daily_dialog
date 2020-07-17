@@ -9,8 +9,12 @@ from pycocoevalcap.bleu.bleu import Bleu
 from collections import defaultdict
 from nltk.translate.bleu_score import corpus_bleu
 from sklearn.metrics import accuracy_score,f1_score,precision_score,recall_score,confusion_matrix
+import bert_score
+from bert_score import score
+
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.ERROR)
 
 EOS_ID = 50256
 
@@ -157,6 +161,11 @@ def get_model_metrics(model, tokenizer, eval_dataloader, args):
 
 
     BLEUscore = nltk_BLEU_4(generated, reference)
+
+    gen, ref = [], []
+    for g in zip(generated, reference):
+        gen.append(' '.join(g[0]))
+
 
     P, R, F1 = score(generated, reference, lang='en', verbose=True)
     print("BERTscore = ",F1.mean())
